@@ -104,7 +104,8 @@ tstats.wmat=wmat;
 % healthy matrix
 if graphics, figure(1); clf; end
 for instate=1:size(instates,1)
-  percept=squeeze(3.*momentum.*instates(instate,:));
+  instate
+  percept=squeeze(3.*momentum.*instates(instate,:))
   noisevec=noisemag.*(randn(1,length(percept))-.5);
   invec(1,:)=startstate(instate,:);
   for time=2:timelimit

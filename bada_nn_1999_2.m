@@ -54,8 +54,7 @@ instates= [0 0 0 0 ; % threat absent not vigilant
 	      .1 0 0 0 ]; % threat present vigilant
       
       
-instatenames={'threat absent not vigilant interoceptive','threat present not vigilant interoceptive','threat absent vigilant interoceptive',
-    'threat present vigilant not interoceptive', 'threat absent not vigilant not interoceptive', 'threat present not vigilant not interoceptive'};
+instatenames={'threat absent not vigilant interoceptive','threat present not vigilant interoceptive','threat absent vigilant interoceptive','threat present vigilant not interoceptive', 'threat absent not vigilant not interoceptive', 'threat present not vigilant not interoceptive'};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 wthreatthreat=[1 1];
 wthreatvigilance=[1 2];
@@ -122,7 +121,7 @@ for instate=1:size(instates,1)
     end
   end
   if graphics
-    subplot(3,2,instate);
+    subplot(2,3,instate);
     plotinvec(invec,timelimit);
     title(instatenames{instate});
     allinvecs(instate,:,:)=invec;
