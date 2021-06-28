@@ -104,8 +104,7 @@ tstats.wmat=wmat;
 % healthy matrix
 if graphics, figure(1); clf; end
 for instate=1:size(instates,1)
-  instate
-  percept=squeeze(3.*momentum.*instates(instate,:))
+  percept=squeeze(3.*momentum.*instates(instate,:));
   noisevec=noisemag.*(randn(1,length(percept))-.5);
   invec(1,:)=startstate(instate,:);
   for time=2:timelimit
@@ -122,7 +121,7 @@ for instate=1:size(instates,1)
     allinvecs(instate,:,:)=invec;
   end
   for nodenum=1:size(invec,2)
-    tstats.proptime0(instate,nodenum)=length(find(invec(:,nodenum)==0))./size(invec,1);
+    tstats.proptime0(instate,nodenum)=length(find(invec(:,nodenum)==0))./size(invec,1); 
     tstats.proptime1(instate,nodenum)=length(find(invec(:,nodenum)>1))./size(invec,1);
     tstats.proptime2(instate,nodenum)=length(find(invec(:,nodenum)==2))./size(invec,1);
     tstats.AUC(instate,nodenum)=sum(invec(:,nodenum))./size(invec,1);

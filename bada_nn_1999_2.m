@@ -126,10 +126,12 @@ for instate=1:size(instates,1)
     title(instatenames{instate});
     allinvecs(instate,:,:)=invec;
   end
+  % rows of proptime are the different possible states('no threat vigilant
+  % interoceptive', etc.). Columns are each network (executive, interoceptive, etc) 
   for nodenum=1:size(invec,2)
-    tstats.proptime0(instate,nodenum)=length(find(invec(:,nodenum)==0))./size(invec,1);
-    tstats.proptime1(instate,nodenum)=length(find(invec(:,nodenum)>1))./size(invec,1);
-    tstats.proptime2(instate,nodenum)=length(find(invec(:,nodenum)==2))./size(invec,1);
+    tstats.proptime0(instate,nodenum)=length(find(invec(:,nodenum)==0))./size(invec,1); %proportion of time in 0
+    tstats.proptime1(instate,nodenum)=length(find(invec(:,nodenum)>1))./size(invec,1); % proportion of time in 1
+    tstats.proptime2(instate,nodenum)=length(find(invec(:,nodenum)==2))./size(invec,1); % proportion of time at 2
     tstats.AUC(instate,nodenum)=sum(invec(:,nodenum))./size(invec,1);
   end
 end
@@ -145,14 +147,12 @@ end
 function[logval]=slimit(x,thresh,negthresh) 
 if nargin<2, thresh=2; end
 if nargin<3, negthresh=0; end % was -.75
-disp(max(x,negthresh))
 logval=min(max(x,negthresh),thresh);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % function that plots out the network
 function plotinvec(net,timelimit)
-disp(net)
 if nargin<2, timelimit=size(net,2); end
 h=plot(net);
 set(h,'LineWidth',2.14);
