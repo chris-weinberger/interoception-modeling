@@ -1,4 +1,4 @@
-function bada_nn_manyways()
+function bada_nn_combinatorics_sim()
 
 
 global gwmat gstartstate ginstates;
@@ -11,7 +11,7 @@ gstartstate=[0 0 0.5 0.5 ; % threat absent not vigilant w int
 	        0 1 0.5 0   ; % threat present vigilant w/o int
             0 0 0.5 0   ; % threat absent vigilant w/o int
 	        0 0 0.5 0   ]; % threat present vigilant w/o int
-    
+
 % what comes in
 ginstates= [0 0 0 0 ; % threat absent not vigilant
 	      .1 0 0 0 ; % threat present not vigilant
@@ -19,7 +19,7 @@ ginstates= [0 0 0 0 ; % threat absent not vigilant
 	      .1 0 0 0 ; % threat present vigilant
            0 0 0 0 ; % threat absent vigilant
 	      .1 0 0 0 ]; % threat present vigilant  
-  
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the "well regulated" model
 owmat=[  .9        .15        0       0   ;   % external threat
@@ -45,7 +45,54 @@ timeinteroceptiveAUC = tstats.AUC(:,4);
 %    0.4116
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-num_trials = 10;
+% In this code, we will run through all possible combinations of values
+% in the range [-.5, .5], by increments of 0.1, in all positions of the
+% weight matrix except for the diagonal
+
+%Define the starting matrix:
+startmat=[.9       -.5      -.5     -.5   ;   % external threat
+   	     -.5        .9      -.5     -.5   ;   % vigilance/salience       % FROM THESE NETWORKS
+	     -.5       -.5       .9     -.5   ;   % avoidance/control
+         -.5       -.5      -.5     .9  ];   % interoception
+
+svig0=zeros(6,num_trials);
+sint0 = zeros(6,num_trials);
+svigAUC = zeros(6,num_trials);
+sintAUC = zeros(6,num_trials);
+
+counter=1;
+
+% loop over rows
+for i=1:4
+    % loop over columns
+    for j=1:4
+        while startmat(i,j) < 0.5
+            gwmat=startmat;
+            tstats(simnum)=bada_nn_1999_2('useglobals');
+  
+            %sgvig 0: columns are trials from above simulation, 
+            % rows contain proportion of time that vigilance was in each possible
+            % state (threat vigilant interoceptive, etc.)
+            svig0(:,simnum)=tstats(simnum).proptime0(:,2); 
+
+            %sint0, same as above, but interoceptive
+            sint0(:,simnum) = tstats(simnum).proptime0(:,4);
+
+            svigAUC(:,simnum)=tstats(simnum).AUC(:,2);
+            sintAUC(:,simnum)=tstats(simnum).AUC(:,4);
+
+            fprintf('.');
+            if mod(simnum,20)==0, fprintf('\n'); end
+            count+=1;
+        end
+        % do not change diagonal value
+        if i~=j
+            
+        end
+    end    
+end
+
+num_trials = 100;
 
 %pre-allocate the size of the arrays that will be filled below, reduce
 %runtime
@@ -77,7 +124,7 @@ for simnum=1:num_trials
 end
 fprintf('\n');
 
-save('bada_nn_sims_interoceptive.mat', 'tstats', 'svig0','svigAUC')
+save('bada_nn_sims_interoceptive.mat', 'tstats', 'svig0','svigAUC', 'sint0','sintAUC')
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -276,7 +323,7 @@ ylabel('%');
 %% Six subplots of interoceptive AUC
 
 bincenters=0:.05:1;
-figure(4); clf;
+figure(5); clf;
 subplot(2,3,1);
 histogram(sintAUC(1,:),bincenters); 
 h=text(timeinteroceptiveAUC(1),25,'*'); 
@@ -285,54 +332,54 @@ set(h,'FontSize',14);
 title('threat absent not vigilant interoceptive');
 xlabel('prop interoceptive=0');
 ylabel('%');
-axis([0 1 0 100]);
+axis([0 2 0 60]);
 
 subplot(2,3,2);
-histogram(sint0(2,:),bincenters); 
-h=text(timeinteroceptive0(2),25,'*'); 
+histogram(sintAUC(2,:),bincenters); 
+h=text(timeinteroceptiveAUC(2),25,'*'); 
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat present not vigilant interoceptive');
 xlabel('prop interoceptive=0');
 ylabel('%');
-axis([0 1 0 100]);
+axis([0 2 0 60]);
 
 subplot(2,3,3);
-histogram(sint0(3,:),bincenters); 
-h=text(timeinteroceptive0(3),25,'*'); 
+histogram(sintAUC(3,:),bincenters); 
+h=text(timeinteroceptiveAUC(3),25,'*'); 
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat absent vigilant interoceptive');
 xlabel('prop interoceptive=0');
 ylabel('%');
-axis([0 1 0 100]);
+axis([0 2 0 60]);
 
 subplot(2,3,4);
-histogram(sint0(4,:),bincenters); 
-h=text(timeinteroceptive0(4),25,'*'); 
+histogram(sintAUC(4,:),bincenters); 
+h=text(timeinteroceptiveAUC(4),25,'*'); 
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat present vigilant not interoceptive');
 xlabel('prop interoceptive=0');
-axis([0 1 0 100]);
+axis([0 2 0 60]);
 ylabel('%');
 
 subplot(2,3,5);
-histogram(sint0(5,:),bincenters); 
-h=text(timeinteroceptive0(5),25,'*'); 
+histogram(sintAUC(5,:),bincenters); 
+h=text(timeinteroceptiveAUC(5),25,'*'); 
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat absent not vigilant not interoceptive');
 xlabel('prop interoceptive=0');
-axis([0 1 0 100]);
+axis([0 2 0 60]);
 ylabel('%');
 
 subplot(2,3,6);
-histogram(sint0(6,:),bincenters); 
-h=text(timeinteroceptive0(6),25,'*'); 
+histogram(sintAUC(6,:),bincenters); 
+h=text(timeinteroceptiveAUC(6),25,'*'); 
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat present not vigilant not interoceptive');
 xlabel('prop vigilance=0');
-axis([0 1 0 100]);
+axis([0 2 0 60]);
 ylabel('%');

@@ -1,4 +1,4 @@
-function bada_nn_manyways()
+function bada_nn_combinatorics_sim()
 
 
 global gwmat gstartstate ginstates;
@@ -11,7 +11,7 @@ gstartstate=[0 0 0.5 0.5 ; % threat absent not vigilant w int
 	        0 1 0.5 0   ; % threat present vigilant w/o int
             0 0 0.5 0   ; % threat absent vigilant w/o int
 	        0 0 0.5 0   ]; % threat present vigilant w/o int
-    
+
 % what comes in
 ginstates= [0 0 0 0 ; % threat absent not vigilant
 	      .1 0 0 0 ; % threat present not vigilant
@@ -19,7 +19,7 @@ ginstates= [0 0 0 0 ; % threat absent not vigilant
 	      .1 0 0 0 ; % threat present vigilant
            0 0 0 0 ; % threat absent vigilant
 	      .1 0 0 0 ]; % threat present vigilant  
-  
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the "well regulated" model
 owmat=[  .9        .15        0       0   ;   % external threat
@@ -45,39 +45,67 @@ timeinteroceptiveAUC = tstats.AUC(:,4);
 %    0.4116
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-num_trials = 100;
+%% SIMULATIONS
 
-%pre-allocate the size of the arrays that will be filled below, reduce
-%runtime
-svig0=zeros(6,num_trials);
-sint0 = zeros(6,num_trials);
-svigAUC = zeros(6,num_trials);
-sintAUC = zeros(6,num_trials);
+% In this code, we will run through all possible combinations of values
+% in the range [-.5, .5], by increments of 0.1, in all positions of the
+% weight matrix except for the diagonal
 
-% now the full parameter space
-for simnum=1:num_trials
-  %randvals=(rand(3,3)-.5)./2;
-  randvals=(rand(4,4)-.5);
-  gwmat=max(0,min(1,owmat+randvals));
-  tstats(simnum)=bada_nn_1999_2('useglobals');
-  
-  %sgvig 0: columns are trials from above simulation, 
-  % rows contain proportion of time that vigilance was in each possible
-  % state (threat vigilant interoceptive, etc.)
-  svig0(:,simnum)=tstats(simnum).proptime0(:,2); 
-  
-  %sint0, same as above, but interoceptive
-  sint0(:,simnum) = tstats(simnum).proptime0(:,4);
-  
-  svigAUC(:,simnum)=tstats(simnum).AUC(:,2);
-  sintAUC(:,simnum)=tstats(simnum).AUC(:,4);
-  
-  fprintf('.');
-  if mod(simnum,20)==0, fprintf('\n'); end
+
+%Define the starting matrix:
+startmat=[.9       -.5      -.5     -.5   ;   % external threat
+   	     -.5        .9      -.5     -.5   ;   % vigilance/salience       % FROM THESE NETWORKS
+	     -.5       -.5       .9     -.5   ;   % avoidance/control
+         -.5       -.5      -.5     .9  ];   % interoception
+
+
+% There are 120 trials total
+svig0=zeros(6,120);
+sint0 = zeros(6,120);
+svigAUC = zeros(6,120);
+sintAUC = zeros(6,120);
+
+counter=1;
+
+% loop over rows
+for i=1:4
+    fprintf('----------ROW %d---------\n', i);
+    % loop over columns
+    for j=1:4
+        fprintf('----------COLUMN %d---------\n', j);
+        % do not change diagonal value
+        if i~=j
+            while startmat(i,j) < 0.5
+                gwmat=startmat;
+                tstats(counter)=bada_nn_1999_2('useglobals');
+
+                %sgvig 0: columns are trials from above simulation, 
+                % rows contain proportion of time that vigilance was in each possible
+                % state (threat vigilant interoceptive, etc.)
+                svig0(:,counter)=tstats(counter).proptime0(:,2); 
+
+                %sint0, same as above, but interoceptive
+                sint0(:,counter) = tstats(counter).proptime0(:,4);
+
+                svigAUC(:,counter)=tstats(counter).AUC(:,2);
+                sintAUC(:,counter)=tstats(counter).AUC(:,4);
+
+                fprintf('.');
+                if mod(counter,10)==0, fprintf('\n'); end
+                counter=counter+1;
+                
+                % increment current entry in weight matrix
+                startmat(i,j) = startmat(i,j)+0.1;
+            end
+        end
+       
+    end
+    fprintf('*-*-*-*-*-*-*-*-*-*\n');
 end
+
 fprintf('\n');
 
-save('bada_nn_sims_interoceptive.mat', 'tstats', 'svig0','svigAUC', 'sint0','sintAUC')
+save('bada_nn_combinatoric_sims.mat', 'tstats', 'svig0','svigAUC', 'sint0','sintAUC')
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -269,7 +297,7 @@ h=text(timeinteroceptive0(6),25,'*');
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat present not vigilant not interoceptive');
-xlabel('prop vigilance=0');
+xlabel('prop interoceptive=0');
 axis([0 1 0 100]);
 ylabel('%');
 
@@ -283,7 +311,7 @@ h=text(timeinteroceptiveAUC(1),25,'*');
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat absent not vigilant interoceptive');
-xlabel('prop interoceptive=0');
+xlabel('interoceptive AUC');
 ylabel('%');
 axis([0 2 0 60]);
 
@@ -293,7 +321,7 @@ h=text(timeinteroceptiveAUC(2),25,'*');
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat present not vigilant interoceptive');
-xlabel('prop interoceptive=0');
+xlabel('interoceptive AUC');
 ylabel('%');
 axis([0 2 0 60]);
 
@@ -303,7 +331,7 @@ h=text(timeinteroceptiveAUC(3),25,'*');
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat absent vigilant interoceptive');
-xlabel('prop interoceptive=0');
+xlabel('interoceptive AUC');
 ylabel('%');
 axis([0 2 0 60]);
 
@@ -313,7 +341,7 @@ h=text(timeinteroceptiveAUC(4),25,'*');
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat present vigilant not interoceptive');
-xlabel('prop interoceptive=0');
+xlabel('interoceptive AUC');
 axis([0 2 0 60]);
 ylabel('%');
 
@@ -323,7 +351,7 @@ h=text(timeinteroceptiveAUC(5),25,'*');
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat absent not vigilant not interoceptive');
-xlabel('prop interoceptive=0');
+xlabel('interoceptive AUC');
 axis([0 2 0 60]);
 ylabel('%');
 
@@ -333,6 +361,6 @@ h=text(timeinteroceptiveAUC(6),25,'*');
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat present not vigilant not interoceptive');
-xlabel('prop vigilance=0');
+xlabel('interoceptive AUC');
 axis([0 2 0 60]);
 ylabel('%');

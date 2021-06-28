@@ -1,4 +1,4 @@
-function bada_nn_manyways()
+function bada_nn_manyways_interoception_model()
 
 
 global gwmat gstartstate ginstates;
@@ -269,7 +269,7 @@ h=text(timeinteroceptive0(6),25,'*');
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat present not vigilant not interoceptive');
-xlabel('prop vigilance=0');
+xlabel('prop interoceptive=0');
 axis([0 1 0 100]);
 ylabel('%');
 
@@ -283,7 +283,7 @@ h=text(timeinteroceptiveAUC(1),25,'*');
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat absent not vigilant interoceptive');
-xlabel('prop interoceptive=0');
+xlabel('interoceptive AUC');
 ylabel('%');
 axis([0 2 0 60]);
 
@@ -293,7 +293,7 @@ h=text(timeinteroceptiveAUC(2),25,'*');
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat present not vigilant interoceptive');
-xlabel('prop interoceptive=0');
+xlabel('interoceptive AUC');
 ylabel('%');
 axis([0 2 0 60]);
 
@@ -303,7 +303,7 @@ h=text(timeinteroceptiveAUC(3),25,'*');
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat absent vigilant interoceptive');
-xlabel('prop interoceptive=0');
+xlabel('interoceptive AUC');
 ylabel('%');
 axis([0 2 0 60]);
 
@@ -313,7 +313,7 @@ h=text(timeinteroceptiveAUC(4),25,'*');
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat present vigilant not interoceptive');
-xlabel('prop interoceptive=0');
+xlabel('interoceptive AUC');
 axis([0 2 0 60]);
 ylabel('%');
 
@@ -323,7 +323,7 @@ h=text(timeinteroceptiveAUC(5),25,'*');
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat absent not vigilant not interoceptive');
-xlabel('prop interoceptive=0');
+xlabel('interoceptive AUC');
 axis([0 2 0 60]);
 ylabel('%');
 
@@ -333,6 +333,6 @@ h=text(timeinteroceptiveAUC(6),25,'*');
 set(h,'Color',[1 0 0]);
 set(h,'FontSize',14);
 title('threat present not vigilant not interoceptive');
-xlabel('prop vigilance=0');
+xlabel('interoceptive AUC');
 axis([0 2 0 60]);
 ylabel('%');
