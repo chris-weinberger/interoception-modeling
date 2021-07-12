@@ -19,7 +19,7 @@ tstats.psychstates=psychstates;
 %% initialize the network for healthy and ruminative and BADA people
 nodenames={'threat','vigilance','avoidance','interoceptive'};
 tstats.nodenames=nodenames;
-% over the diagonal is feed forward
+%over the diagonal is feed forward
 % under the diagonal is feed backward
 %healthywmat=[ 1        .5        0        0   ;   % external threat
 %              0         1       .5        0   ;   % Salience/vigilance/rum
@@ -37,47 +37,24 @@ decvec=[0 0 0 0];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% states we will model
-
-% where we start - there should be eight combinations of possible scenarios
-% because we have three different variables: so 2^3 = 8
-
-startstate=[0  1  0.5  0.5 ; % threat present vigilant int
- 	        0  1  0.5  0   ; % threat present vigilant not int
-	        0  0  0.5  0.5 ; % threat present not vigilant int
-	        0  0  0.5    0 ; % threat present not vigilant not int
-            0  1  0.5  0.5 ; % threat absent vigilant int
-	        0  1  0.5    0 ; % threat absent vigilant not int
-            0  0  0.5  0.5 ; % threat absent not vigilant int
-            0  0  0.5    0 ]; % threat absent not vigilant not int
-
-instates=[.1 0 0 0 ; % threat present vigilant int
-	      .1 0 0 0 ; % threat present vigilant not int
-	      .1 0 0 0 ; % threat present not vigilant int
-	      .1 0 0 0 ; % threat present vigilant
-           0 0 0 0 ; % threat present not vigilant not int
-	       0 0 0 0 ; % threat absent vigilant int
-           0 0 0 0 ; % threat absent not vigilant int
-           0 0 0 0 ]; % threat absent not vigilant not int
-
-
 % where we start
-% startstate=[0  0  0.5  0.5 ; % threat absent not vigilant w int
-%  	        0  0  0.5  0.5 ; % threat present not vigilant w int
-% 	        0  1  0.5  0.5 ; % threat absent vigilant w int
-% 	        0  1  0.5    0 ; % threat present vigilant w/o int
-%             0  0  0.5    0 ; % threat absent vigilant w/o int
-% 	        0  0  0.5    0 ]; % threat present vigilant w/o int
+startstate=[0 0 0.5 0.5 ; % threat absent not vigilant w int
+ 	        0 0 0.5 0.5 ; % threat present not vigilant w int
+	        0 1 0.5 0.5 ; % threat absent vigilant w int
+	        0 1 0.5 0   ; % threat present vigilant w/o int
+            0 0 0.5 0   ; % threat absent vigilant w/o int
+	        0 0 0.5 0   ]; % threat present vigilant w/o int
 
 % what comes in
-% instates= [0 0 0 0 ; % threat absent not vigilant
-% 	      .1 0 0 0 ; % threat present not vigilant
-% 	       0 0 0 0 ; % threat absent vigilant
-% 	      .1 0 0 0 ; % threat present vigilant
-%            0 0 0 0 ; % threat absent vigilant
-% 	      .1 0 0 0 ]; % threat present vigilant
-
-
-instatenames={'threat present vigilant interoceptive','threat present vigilant not interoceptive','threat present not vigilant interoceptive','threat present not vigilant not interoceptive', 'threat absent vigilant interoceptive', 'threat absent vigilant not interoceptive','threat absent not vigilant interoceptive', 'threat absent not vigilant not interoceptive'};
+instates= [0 0 0 0 ; % threat absent not vigilant
+	      .1 0 0 0 ; % threat present not vigilant
+	       0 0 0 0 ; % threat absent vigilant
+	      .1 0 0 0 ; % threat present vigilant
+           0 0 0 0 ; % threat absent vigilant
+	      .1 0 0 0 ]; % threat present vigilant
+      
+      
+instatenames={'threat absent not vigilant interoceptive','threat present not vigilant interoceptive','threat absent vigilant interoceptive','threat present vigilant not interoceptive', 'threat absent not vigilant not interoceptive', 'threat present not vigilant not interoceptive'};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 wthreatthreat=[1 1];
 wthreatvigilance=[1 2];
@@ -144,7 +121,7 @@ for instate=1:size(instates,1)
     end
   end
   if graphics
-    subplot(2,4,instate);
+    subplot(2,3,instate);
     plotinvec(invec,timelimit);
     title(instatenames{instate});
     allinvecs(instate,:,:)=invec;

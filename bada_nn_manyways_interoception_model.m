@@ -58,8 +58,9 @@ sintAUC = zeros(6,num_trials);
 for simnum=1:num_trials
   %randvals=(rand(3,3)-.5)./2;
   randvals=(rand(4,4)-.5);
-  gwmat=max(0,min(1,owmat+randvals)); %why no negative values? No inhibition?
-  tstats(simnum)=bada_nn_1999_2('useglobals');
+  % was initially [0,1], now [-1,1]
+  gwmat=max(-1,min(1,owmat+randvals)); %why no negative values? No inhibition?
+  tstats(simnum)=bada_nn_1999_2('useglobals',0);
   
   %sgvig 0: columns are trials from above simulation, 
   % rows contain proportion of time that vigilance was in each possible
