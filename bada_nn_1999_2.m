@@ -157,10 +157,10 @@ for instate=1:size(instates,1)
     tstats.proptime2(instate,nodenum)=length(find(invec(:,nodenum)==2))./size(invec,1); % proportion of time at 2
     tstats.AUC(instate,nodenum)=sum(invec(:,nodenum))./size(invec,1);
   end
+  
 end
 %legend(nodenames);
-
-
+tstats.invec=invec;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % implementing hard limit in which there is a high upper threshold on activation in the model
 % and a low limit on negative activation (inhibition). This is neurally feasible as it represents 
