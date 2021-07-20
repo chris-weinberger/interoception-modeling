@@ -94,6 +94,19 @@ wmat=[  .9        .15        0       0   ;   % external threat
 	  -.25       -.04       .9    -.1   ;   % avoidance/control
          0        .25       .15     .9  ];   % interoception
 
+     % output from erroneous parameter-fitting
+wmat = [0.8022    0.1514    0.0043    0.0019;
+   -0.0006    1.5413    0.3589    0.8414;
+   -0.3436   -0.1819    0.5150    0.2722;
+   -0.0016   -0.3196    0.1237   -0.0047];
+
+    % output from control patient 2303 neutral-rest
+wmat = [0.8968    0.1355    0.0130    0.0093;
+    0.0067    0.9122   -0.0970    0.7343;
+   -0.7840   -0.0777    1.1813    0.1940;
+    0.0035    0.1666   -0.0685    0.1486];
+
+
 for statenum=1:length(psychstates)
   statetouse=psychstates{statenum};
   switch statetouse

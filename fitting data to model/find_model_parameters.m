@@ -2,7 +2,7 @@
 % test here. If we want to keep the diagonal on 0.9 then we can pass in 12
 % parameters
 
-function ret=findmodelweights(weights)
+function ret=find_model_parameters(weights)
 
 global gwmat gstartstate ginstates;
 
@@ -12,7 +12,7 @@ owmat=[  .9        .15        0       0   ;   % external threat
 	  -.25       -.04       .9    -.1   ;   % avoidance/control
          0        .25       .15     .9  ];   % interoception 
 
-weight = reshape(transpose(owmat),1,16);
+weight = reshape(owmat,1,16);
 gwmat=owmat;
 
 ret=fminsearch(@weightsearch, weight);
@@ -72,9 +72,9 @@ opts.EmptyLineRule = "read";
 
 % Import the data, rmmissing() removes the row of nan's that comes in the
 % data
-executiverestcontrols = rmmissing(readtable("C:\Users\chris\Documents\interoception-modeling\data\executive_rest_controls.csv", opts));
-saliencerestcontrols = rmmissing(readtable("C:\Users\chris\Documents\interoception-modeling\data\salience_rest_controls.csv", opts));
-interoceptiverestcontrols = rmmissing(readtable("C:\Users\chris\Documents\interoception-modeling\data\interoceptive_rest_controls.csv", opts));
+executiverestcontrols = rmmissing(readtable("C:\Users\chris\Documents\interoception-modeling\data\2303_executive_neutral_76_scans.csv", opts));
+saliencerestcontrols = rmmissing(readtable("C:\Users\chris\Documents\interoception-modeling\data\2303_salience_neutral_76_scans.csv", opts));
+interoceptiverestcontrols = rmmissing(readtable("C:\Users\chris\Documents\interoception-modeling\data\2303_interoceptive_neutral_76_scans.csv", opts));
 
 % examine this data later... some values are negative even though there are
 % no negative values in the simulated data. May need to address this
