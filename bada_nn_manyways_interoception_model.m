@@ -23,7 +23,7 @@ ginstates=[.1 0 0 0 ; % threat present vigilant int
 	       0 0 0 0 ; % threat absent vigilant int
            0 0 0 0 ; % threat absent not vigilant int
            0 0 0 0 ]; % threat absent not vigilant not int
-  
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the "well regulated" model
 owmat=[  .9        .15        0       0   ;   % external threat
