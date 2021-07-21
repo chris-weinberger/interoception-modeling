@@ -2,9 +2,16 @@
 % test here. If we want to keep the diagonal on 0.9 then we can pass in 12
 % parameters
 
-function ret=find_model_parameters(weights)
+function ret=find_model_parameters(individual, test)
+% default is first control patient
+if nargin < 1, individual = 2303; end
+if nargin < 2, test = 'neutral'; end
 
-global gwmat gstartstate ginstates;
+% these global variables are used in weightsearch to know which data to
+% open
+global ind typetest;
+ind = individual;
+typetest = test;
 
 % the "well regulated" model
 owmat=[  .9        .15        0       0   ;   % external threat
@@ -13,8 +20,6 @@ owmat=[  .9        .15        0       0   ;   % external threat
          0        .25       .15     .9  ];   % interoception 
 
 weight = reshape(owmat,1,16);
-gwmat=owmat;
-
 ret=fminsearch(@weightsearch, weight);
 
 
@@ -70,11 +75,33 @@ opts.VariableTypes = ["double", "double", "double", "double", "double", "double"
 opts.ExtraColumnsRule = "ignore";
 opts.EmptyLineRule = "read";
 
+% we must select the correct data to open, based on the global variables
+% ind and typetest
+if strcmp(typetest, 'neutral') % neutral case
+    csv_executive = sprintf('%d_executive_%s_76_scans.csv',ind,typetest);
+    filename_executive = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','neutral_rest_76_scans',csv_executive,filesep);
+    
+    csv_salience = sprintf('%d_salience_forward_%s_76_scans.csv',ind,typetest);
+    filename_salience = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','neutral_rest_76_scans',csv_salience,filesep);
+    
+    csv_interoceptive = sprintf('%d_interoceptive_forward_%s_76_scans.csv',ind,typetest);
+    filename_interoceptive = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','neutral_rest_76_scans',csv_interoceptive,filesep);
+else % criticism case
+    csv_executive = sprintf('%d_executive_%s_76_scans.csv',ind,typetest);
+    filename_executive = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','ctiticism_rest_76_scans',csv_executive,filesep);
+    
+    csv_salience = sprintf('%d_salience_forward_%s_76_scans.csv',ind,typetest);
+    filename_salience = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','criticism_rest_76_scans',csv_salience,filesep);
+    
+    csv_interoceptive = sprintf('%d_interoceptive_forward_%s_76_scans.csv',ind,typetest);
+    filename_interoceptive = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','criticism_rest_76_scans',csv_interoceptive,filesep);
+end
+
 % Import the data, rmmissing() removes the row of nan's that comes in the
 % data
-executiverestcontrols = rmmissing(readtable("C:\Users\chris\Documents\interoception-modeling\data\2303_executive_neutral_76_scans.csv", opts));
-saliencerestcontrols = rmmissing(readtable("C:\Users\chris\Documents\interoception-modeling\data\2303_salience_neutral_76_scans.csv", opts));
-interoceptiverestcontrols = rmmissing(readtable("C:\Users\chris\Documents\interoception-modeling\data\2303_interoceptive_neutral_76_scans.csv", opts));
+executiverestcontrols = rmmissing(readtable(filename_executive, opts));
+saliencerestcontrols = rmmissing(readtable(filename_salience, opts));
+interoceptiverestcontrols = rmmissing(readtable(filename_interoceptive, opts));
 
 % examine this data later... some values are negative even though there are
 % no negative values in the simulated data. May need to address this
@@ -95,75 +122,3 @@ loss = mean(sqrt((convolved_exec_data - interpolated_exec_data).^2 + (convolved_
 
 ret=loss;
 if ret < 0.0003, ret = 0; end
-
-
-
-% TR -> scan repeat time
-% wav -> parameters of response function... use 'canonical' parameters
-
-% specific questions to be answered:
-% 1. what is scan repeat time? First argument of spm_hrf
-% 2. what should our resamprate be? 100? What does this mean?
-% 3. what about onset delay? Is 0.2 okay?
-
-% function ret=findhemoampsust(TR,wav)
-% if nargin<2, TR=1; end
-% if nargin<1,
-%   %wav=spm_hrf(TR, [6,16,1,1,6,0,32]); % original version
-%   wav=spm_hrf(TR, [8,16,1,1,6,0,32]); % delayed version
-% end
-% % uses the fminsearch procedure
-% % to find the optimal height and delay to match a known hemodynamic response
-% 
-% global sinp;
-% sinp.wav=wav;
-% sinp.TR=TR;
-% 
-% 
-% amp=.2;
-% sust=1; % in seconds
-% initial = zeros(1,18); %flattened array of starting matrix values
-% initial(1) = amp;
-% initial(2) = sust;
-% 
-% ret=fminsearch(@hemomatch,initial)
-% 
-% function ret=hemomatch(ampsust)
-%   global sinp;
-%   
-%   resamprate=100;
-%   onsetdelay=.2;
-% 
-%   amp=ampsust(1);
-%   sust=ampsust(2);
-%   
-%   weights = ampsust(3:length(ampsust));
-% 
-%   % get standard hemodynamic response... [6,16,1,1,6,0,32] is
-%   % canonical hemodynamic parameters.
-%   hemoir=spm_hrf(1./resamprate, [6,16,1,1,6,0,32]); % start out 100 times per second
-%   
-%   % create pulsetrain vector
-%   pulsetrain=zeros(size(hemoir));
-%   
-%   % fill it with amp, which is 0.2 right now
-%   pulsetrain(round(onsetdelay.*resamprate):round(resamprate.*(onsetdelay+sust)))=amp;
-%   
-%   % convolve the interpolated data(?) with standard hemodynamic response to
-%   % get what fMRI data would look like
-%   convpulse=conv(pulsetrain,hemoir);
-%   convpulse=convpulse(1:length(hemoir));
-%   
-%   % this is where the interpolation happens?
-%   convpulseresamp=resample(convpulse,length(convpulse),length(sinp.wav))';
-%   
-%   %ret=sin(amp)+sust.^2;
-%   
-%   % compute the loss function right here
-%   ret=mean((convpulseresamp-sinp.wav).^2);
-%   
-%   if ret<0.00003, ret=0; end
-%   
-%   fprintf('Amp=%.3f   Sust=%.3f   MSD=%.7f\n',amp,sust,ret);
-%   plot([convpulseresamp sinp.wav]);
-%   drawnow;
