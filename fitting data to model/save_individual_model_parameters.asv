@@ -1,7 +1,0 @@
-% This function will loop through all patient data in the /data directory
-% and save weight matrices for each of their profiles (criticism-rest and neutral-rest). 
-% For example, patient 2303 will have two associated weight matrices:
-% One for criticism-rest, and one for neutral-rest.
-%
-% All of these weight matrices for patients will be stored in a .mat file
-% which contains a single struct with the following layout

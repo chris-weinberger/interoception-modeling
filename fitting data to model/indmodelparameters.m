@@ -35,6 +35,7 @@ for person=1:length(individuals)
     individual_weight_matrix = find_model_parameters(ind, 'neutral');
     neutral.ind = reshape(individual_weight_matrix, 4 ,4);
     
+    
     % next gather criticism matrix data for current individual
     individual_weight_matrix = find_model_parameters(ind, 'criticism');
     criticism.ind = reshape(individual_weight_matrix, 4, 4);
