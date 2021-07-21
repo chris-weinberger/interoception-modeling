@@ -26,6 +26,7 @@ ret=fminsearch(@weightsearch, weight);
 function ret=weightsearch(weights)
 
 global gwmat gstartstate ginstates;
+global ind typetest;
 
 % where we start -- for now assume all networks start at 0.5
 gstartstate=[0  0.5  0.5  0.5 ]; % threat absent vigilant int
@@ -75,26 +76,28 @@ opts.VariableTypes = ["double", "double", "double", "double", "double", "double"
 opts.ExtraColumnsRule = "ignore";
 opts.EmptyLineRule = "read";
 
+% first change directory to be inside interoception-modeling
+
 % we must select the correct data to open, based on the global variables
 % ind and typetest
 if strcmp(typetest, 'neutral') % neutral case
     csv_executive = sprintf('%d_executive_%s_76_scans.csv',ind,typetest);
-    filename_executive = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','neutral_rest_76_scans',csv_executive,filesep);
+    filename_executive = fullfile('.','data','neutral_rest_76_scans',csv_executive);
     
     csv_salience = sprintf('%d_salience_forward_%s_76_scans.csv',ind,typetest);
-    filename_salience = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','neutral_rest_76_scans',csv_salience,filesep);
+    filename_salience = fullfile('data','neutral_rest_76_scans',csv_salience);
     
     csv_interoceptive = sprintf('%d_interoceptive_forward_%s_76_scans.csv',ind,typetest);
-    filename_interoceptive = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','neutral_rest_76_scans',csv_interoceptive,filesep);
+    filename_interoceptive = fullfile('data','neutral_rest_76_scans',csv_interoceptive);
 else % criticism case
     csv_executive = sprintf('%d_executive_%s_76_scans.csv',ind,typetest);
-    filename_executive = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','ctiticism_rest_76_scans',csv_executive,filesep);
+    filename_executive = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','ctiticism_rest_76_scans',csv_executive);
     
     csv_salience = sprintf('%d_salience_forward_%s_76_scans.csv',ind,typetest);
-    filename_salience = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','criticism_rest_76_scans',csv_salience,filesep);
+    filename_salience = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','criticism_rest_76_scans',csv_salience);
     
     csv_interoceptive = sprintf('%d_interoceptive_forward_%s_76_scans.csv',ind,typetest);
-    filename_interoceptive = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','criticism_rest_76_scans',csv_interoceptive,filesep);
+    filename_interoceptive = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','criticism_rest_76_scans',csv_interoceptive);
 end
 
 % Import the data, rmmissing() removes the row of nan's that comes in the
