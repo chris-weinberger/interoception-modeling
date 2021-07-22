@@ -17,12 +17,12 @@ function struct_data=indmodelparameters
 
 %curr_ind is individual curr_state is neutral/criticis 
 % WINDOWS
-opts = detectImportOptions('C:\Users\chris\Documents\interoception-modeling\data\executive.dandrois','FileType','text');
-A = readmatrix('C:\Users\chris\Documents\interoception-modeling\data\executive.dandrois',opts);
+% opts = detectImportOptions('C:\Users\chris\Documents\interoception-modeling\data\executive.dandrois','FileType','text');
+% A = readmatrix('C:\Users\chris\Documents\interoception-modeling\data\executive.dandrois',opts);
 
 %UNIX
-% opts = detectImportOptions('/data/executive.dandrois','FileType','text');
-% A = readmatrix('/data/executive.dandrois',opts);
+opts = detectImportOptions('/data/executive.dandrois','FileType','text');
+A = readmatrix('/data/executive.dandrois',opts);
 
 
 % patient ID's stored in the first column, get all unique values
@@ -31,16 +31,16 @@ individuals = unique(A(:,1));
 % remove 1500 person which is first item
 individuals = individuals(2:length(individuals),:);
 
-individuals = [2303 3548 3570]; % choosing three profiles do to for testing
+individuals = [2309 3548 3570]; % choosing three profiles do to for testing
 
 for person=1:length(individuals)
     % first get the current indivual
     ind = individuals(person);
     disp(ind);
     
-    % first gather neutral matrix data for current individual
+    % first gather neutral matrix data for current individua
     individual_weight_matrix = find_model_parameters(ind, 'neutral');
-    struct_data.neutral.(sprintf("individual_%s",string(ind))) = reshape(individual_weight_matrix, 4 ,4);
+    struct_data.neutral.(sprintf("individual_%s",string(ind))) = reshape(individual_weight_matrix, 4, 4);
     
     if ind ~= 2301 % person 2301 doesn't have criticism data
         % next gather criticism matrix data for current individual

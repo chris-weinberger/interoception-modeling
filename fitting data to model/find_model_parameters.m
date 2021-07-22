@@ -48,14 +48,16 @@ if strcmp(typetest, 'neutral') % neutral case
     filename_interoceptive = fullfile('data','neutral_rest_76_scans',csv_interoceptive);
 else % criticism case
     csv_executive = sprintf('%d_executive_%s_76_scans.csv',ind,typetest);
-    filename_executive = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','ctiticism_rest_76_scans',csv_executive);
+    filename_executive = fullfile('.','data','criticism_rest_76_scans',csv_executive);
     
     csv_salience = sprintf('%d_salience_forward_%s_76_scans.csv',ind,typetest);
-    filename_salience = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','criticism_rest_76_scans',csv_salience);
+    filename_salience = fullfile('.','data','criticism_rest_76_scans',csv_salience);
     
     csv_interoceptive = sprintf('%d_interoceptive_forward_%s_76_scans.csv',ind,typetest);
-    filename_interoceptive = fullfile('C:\','Users', 'chris','Documents','interoception-modeling','data','criticism_rest_76_scans',csv_interoceptive);
+    filename_interoceptive = fullfile('data','criticism_rest_76_scans',csv_interoceptive);
 end
+
+%2309_executive_criticism_76_scans.csv
 
 % Import the data, rmmissing() removes the row of nan's that comes in the
 % data
@@ -88,7 +90,11 @@ global ind typetest exec_data salience_data interoceptive_data;
 gstartstate=[0  0.5  0.5  0.5 ]; % threat absent vigilant int
 
 % what comes in
-ginstates=[0 0 0 0 ]; % threat absent vigilant int
+if strcmp(typetest, 'neutral')
+    ginstates=[0 0 0 0 ]; % threat absent vigilant int (neutral)
+else
+    ginstates=[0.5 0 0 0 ]; % threat present vigilant int (criticism)
+end
 
 % global weight matrix that will be used in dynamic function
 weight_matrix = reshape(weights, 4, 4);
@@ -111,7 +117,7 @@ resamprate=100; %what should this number be?
 % get standard hemodynamic response
 hemoir=spm_hrf(1./resamprate, [6,16,1,1,6,0,32]); % start out 100 times per second
 
-convolved_threat_data = conv(model_threat_time_data, hemoir);
+% convolved_threat_data = conv(model_threat_time_data, hemoir);
 convolved_salience_data = conv(model_salience_time_data, hemoir);
 convolved_exec_data = conv(model_exec_time_data, hemoir);
 convolved_interoceptive_data = conv(model_interoceptive_time_data, hemoir);
