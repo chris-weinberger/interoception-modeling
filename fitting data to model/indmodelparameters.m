@@ -17,12 +17,12 @@ function struct_data=indmodelparameters
 
 %curr_ind is individual curr_state is neutral/criticis 
 % WINDOWS
-% opts = detectImportOptions('C:\Users\chris\Documents\interoception-modeling\data\executive.dandrois','FileType','text');
-% A = readmatrix('C:\Users\chris\Documents\interoception-modeling\data\executive.dandrois',opts);
+opts = detectImportOptions('C:\Users\chris\Documents\interoception-modeling\data\executive.dandrois','FileType','text');
+A = readmatrix('C:\Users\chris\Documents\interoception-modeling\data\executive.dandrois',opts);
 
 %UNIX
-opts = detectImportOptions('/data/executive.dandrois','FileType','text');
-A = readmatrix('/data/executive.dandrois',opts);
+% opts = detectImportOptions('/data/executive.dandrois','FileType','text');
+% A = readmatrix('/data/executive.dandrois',opts);
 
 
 % patient ID's stored in the first column, get all unique values

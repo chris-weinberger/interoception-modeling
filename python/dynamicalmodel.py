@@ -76,7 +76,7 @@ def slimit(vector, thresh=2, negthresh=0):
     logval = np.clip(vector, negthresh,thresh)
     return logval
 
-def external_percept_simulation():
+def external_percept_simulation(typerun='standard'):
     
     #initial values for interoceptive active inference
     u       = 0.7
@@ -160,6 +160,11 @@ def external_percept_simulation():
                         [0,   -0.4,   0.5, 0.1],    # amygdala
                         [u,      0,     0, 0.5]])   # insula
     
+    if typerun=='useglobals':
+        startstates = globalstartstates
+        instates= globalinstates
+        weights = globalweights
+
     random_weights = np.random.rand(4,4)
     
     # Second timestep array, holds body/control/salience/interoception values
@@ -272,6 +277,7 @@ def external_percept_simulation():
     plt.axis([0, dur, -2, 3])
     plt.title('Interoceptive Approximation and Prediction Errors')
 
+    return circuit_situational_data
     plt.show()
     
 external_percept_simulation()
