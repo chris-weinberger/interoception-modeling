@@ -46,7 +46,7 @@ def weightsearch(weights): # IMPLEMENT THIS
     convolvedinteroceptivedata = np.convolve(simulatedinteroceptivedata, hemoir)
 
     # we need to interpolate fMRI data to be the same length as convolved simulated data
-    
+     
 
     return np.mean(weights)
 
