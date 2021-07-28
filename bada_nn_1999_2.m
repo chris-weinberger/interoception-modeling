@@ -148,10 +148,10 @@ for instate=1:size(instates,1)
   invec(1,:)=startstate(instate,:);
   for time=2:timelimit
     if time==(stimtime/2) && (strcmp(type,'criticism'))
-        criticism = [0.5 0 0 0];
+        criticism = [0.1 0 0 0];
         disp(slimit(decvec+noisevec+percept+(1-momentum).*invec(time-1,:)+(momentum.*((wmat'*invec(time-1,:)'))')))
-        disp(slimit(decvec+noisevec+percept+(1-momentum).*invec(time-1,:)+(momentum.*((wmat'*invec(time-1,:)'))') + criticism))
-        invec(time,:)=slimit(decvec+noisevec+percept+(1-momentum).*invec(time-1,:)+(momentum.*((wmat'*invec(time-1,:)'))') + criticism);
+        disp(slimit(decvec+noisevec+percept+(1-momentum).*invec(time-1,:)+(momentum.*((wmat'*invec(time-1,:)'))') + momentum.*criticism))
+        invec(time,:)=slimit(decvec+noisevec+percept+(1-momentum).*invec(time-1,:)+(momentum.*((wmat'*invec(time-1,:)'))') + momentum.*criticism);
     elseif time<stimtime
       invec(time,:)=slimit(decvec+noisevec+percept+(1-momentum).*invec(time-1,:)+(momentum.*((wmat'*invec(time-1,:)'))'));
     else

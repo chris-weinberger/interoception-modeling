@@ -14,7 +14,7 @@ end
 
 %comment
 
-global gwmat gstartstate ginstates typetest;
+global gwmat gstartstate ginstates gpriormean gpriorvar gnoise typetest;
 
 tstats.psychstates=psychstates;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -37,6 +37,18 @@ decvec=[0 0 0 0];
 %noisemag=0.0001; % tiny noise completely changes the network - adds threat
                   % where there is none
 
+%% Initialize values used in interoceptive inference
+u       = 0.7;
+sigma_u = 0.1;
+v_p     = 2; %can't be zero - dF/dphi vanishes always if phi is zero
+sigma_p = 1;
+phi     = v_p;
+dt      = 0.01;
+dur     = 6;
+steps   = round(dur/momentum);
+epsilon_p = 0;
+epsilon_u = 0;
+                  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% states we will model
 
@@ -85,79 +97,70 @@ type = 'standard';
 
 instatenames={'threat present vigilant interoceptive','threat present vigilant not interoceptive','threat present not vigilant interoceptive','threat present not vigilant not interoceptive', 'threat absent vigilant interoceptive', 'threat absent vigilant not interoceptive','threat absent not vigilant interoceptive', 'threat absent not vigilant not interoceptive'};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-wthreatthreat=[1 1];
-wthreatvigilance=[1 2];
-wthreatavoid=[1 3];
-wvigilancethreat=[2 1];
-wvigilancevigilance=[2 2];
-wvigilanceavoid=[2 3];
-wavoidthreat=[3 1];
-wavoidvigilance=[3 2];
-wavoidavoid=[3 3];
+
         % TO THESE NETWORKS
 wmat=[  .9        .15        0       0   ;   % external threat
    	     0         .9      .25      .25   ;   % vigilance/salience       % FROM THESE NETWORKS
 	  -.25       -.04       .9    -.1   ;   % avoidance/control
          0        .25       .15     .9  ];   % interoception
 
-wmat = [3.70145616563835,0.136906283054430,0.0115174868162189,-0.0294855359910754;
--0.00988584731411681,-1.71513363284323,5.19167529558525,6.51258811638633;
--0.0539579351498396,0.430802569672914,-9.33536831616034,1.29183903769569;
-0.0267840673917464,1.68446897618756,2.38239390778934,-4.37898982259990];
+% wmat = [3.70145616563835,0.136906283054430,0.0115174868162189,-0.0294855359910754;
+% -0.00988584731411681,-1.71513363284323,5.19167529558525,6.51258811638633;
+% -0.0539579351498396,0.430802569672914,-9.33536831616034,1.29183903769569;
+% 0.0267840673917464,1.68446897618756,2.38239390778934,-4.37898982259990];
 
 for statenum=1:length(psychstates)
   statetouse=psychstates{statenum};
   switch statetouse
-   case 'reactive'
-    % clearly that is fairly extreme
-    % suppose we want sustained low level vigilance, just enough control
-    wmat(1,2)=.6; % increase threat-vigilance
-   case 'depressed' % low prefrontal inhibition
-    wmat(2,3)=.05; % decrease vigilance->avoidance
-   case 'ruminative'
-    wmat(2,2)=1; % increase autoconnectivity of vigilance
-   case 'avoidant'
-    wmat(2,3)=.4;
-   case 'noisy' % same as reactive but with noise
-    noisemag=.00005;
-   case 'lowperceive'
-    wmat(1,2)=.015;
-   case 'lowvigilant'
-    wmat(2,2)=.5;
-   case 'overcontrol'
-    wmat(2,3)=.4;
    case 'wellregulated'
    case 'useglobals'
-    wmat=gwmat; startstate=gstartstate; instates=ginstates; type = typetest;
+    wmat=gwmat; startstate=gstartstate; instates=ginstates; type = typetest; sigma_u=gnoise; v_p=gpriormean; sigma_p = gpriorvar;
   end
 end
 
 tstats.wmat=wmat;
 
+%% Initialize matrix used in interoceptive inference
+
+interoceptive_data = zeros(6,timelimit);
+
+interoceptive_data(1,1) = phi;
+interoceptive_data(2,1) = epsilon_p;
+interoceptive_data(3,1) = epsilon_u;
+interoceptive_data(4,1) = sigma_p;
+interoceptive_data(5,1) = sigma_u;
+interoceptive_data(6,1) = v_p;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Show the network's behavior
-
-
 % healthy matrix
 if graphics, figure(1); clf; end
 for instate=1:size(instates,1)
-  percept=squeeze(3.*momentum.*instates(instate,:));
-  noisevec=noisemag.*(randn(1,length(percept))-.5);
-  invec(1,:)=startstate(instate,:);
-  for time=2:timelimit
-    if time==(stimtime/2) && (strcmp(type,'criticism'))
-        criticism = [0.5 0 0 0];
-        disp(slimit(decvec+noisevec+percept+(1-momentum).*invec(time-1,:)+(momentum.*((wmat'*invec(time-1,:)'))')))
-        disp(slimit(decvec+noisevec+percept+(1-momentum).*invec(time-1,:)+(momentum.*((wmat'*invec(time-1,:)'))') + criticism))
-        invec(time,:)=slimit(decvec+noisevec+percept+(1-momentum).*invec(time-1,:)+(momentum.*((wmat'*invec(time-1,:)'))') + criticism);
-    elseif time<stimtime
-      invec(time,:)=slimit(decvec+noisevec+percept+(1-momentum).*invec(time-1,:)+(momentum.*((wmat'*invec(time-1,:)'))'));
-    else
-      invec(time,:)=slimit(decvec+noisevec+(1-momentum).*invec(time-1,:)+(momentum.*((wmat'*invec(time-1,:)'))'));
+    percept=squeeze(3.*momentum.*instates(instate,:));
+    noisevec=noisemag.*(randn(1,length(percept))-.5);
+    invec(1,:)=startstate(instate,:);
+    for time=1:timelimit-1
+        u = invec(time,1);
+        % interoceptive prediction occurs in the insula
+        interoceptive_data(:,time+1) = interoceptive_update(interoceptive_data(:,time), time, momentum, u);
+        % get the current phi prediction generated from
+        % interoceptive_update
+        phi = interoceptive_data(1,time);
+        % this prediction of bodily signal affects amygdala, PFC
+        intero_excitation = [0, phi/3, phi/3, 0];
+            
+        firstcrit = (time < stimtime/4);
+        secondcrit = (time > stimtime/2) && (time < 3* stimtime/4);
+        if (firstcrit || secondcrit) && (strcmp(type,'criticism'))
+            criticism = [0.1 0 0 0]; 
+            invec(time+1,:)=slimit(decvec+noisevec+percept+(1-momentum).*invec(time,:)+(momentum.*((wmat'*invec(time,:)'))') + momentum.*intero_excitation + criticism);
+        elseif time<stimtime
+            invec(time+1,:)=slimit(decvec+noisevec+percept+(1-momentum).*invec(time,:)+(momentum.*((wmat'*invec(time,:)'))') + momentum.*intero_excitation);
+        else
+            invec(time+1,:)=slimit(decvec+noisevec+(1-momentum).*invec(time,:)+(momentum.*((wmat'*invec(time,:)'))') + momentum.*intero_excitation);
+        end
     end
-  end
   if graphics
     subplot(2,4,instate);
     plotinvec(invec,timelimit);
@@ -204,12 +207,12 @@ end
 end
 
 function time_data=interoceptive_update(time_data, t, dt, u)
-    phi = time_data(1,t);
-    epsilon_p = time_data(2,t);
-    epsilon_u = time_data(3,t);
-    sigma_p = time_data(4,t);
-    sigma_u = time_data(5,t);
-    v_p = time_data(6,t);
+    phi = time_data(1);
+    epsilon_p = time_data(2);
+    epsilon_u = time_data(3);
+    sigma_p = time_data(4);
+    sigma_u = time_data(5);
+    v_p = time_data(6);
     
     % here we run a mini simulation that allows the insula to converge on
     % the most likely value for the incoming data.
@@ -221,7 +224,7 @@ function time_data=interoceptive_update(time_data, t, dt, u)
     
     for currtime=1:(num_steps-1)
         phi=phi + dt * (epsilon_u * 2 * phi - epsilon_p);
-        converge_data(1,t+1) = phi;
+        converge_data(1,currtime+1) = phi;
         
         epsilon_p = epsilon_p + dt * epsilon_p_dot(phi, v_p, sigma_p, epsilon_p);
         converge_data(2,currtime+1) = epsilon_p;
@@ -240,12 +243,14 @@ function time_data=interoceptive_update(time_data, t, dt, u)
     end
     
     % Finally, update the next timestep in time_data with the most recent values from converge_data
-    time_data(1,t+1) = converge_data(1,num_steps-1);
-    time_data(2,t+1) = converge_data(2,num_steps-1);
-    time_data(3,t+1) = converge_data(3,num_steps-1);
-    time_data(4,t+1) = converge_data(4,num_steps-1);
-    time_data(5,t+1) = converge_data(5,num_steps-1);
-    time_data(6,t+1) = converge_data(6,num_steps-1);
+    return_array = zeros(6,1);
+    return_array(1) = converge_data(1,num_steps-1);
+    return_array(2) = converge_data(2,num_steps-1);
+    return_array(3) = converge_data(3,num_steps-1);
+    return_array(4) = converge_data(4,num_steps-1);
+    return_array(5) = converge_data(5,num_steps-1);
+    return_array(6) = converge_data(6,num_steps-1);
+    time_data = return_array;
 end
 
 % simple functions used for bayesian prediction

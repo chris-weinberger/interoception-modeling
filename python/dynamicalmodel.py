@@ -5,7 +5,8 @@ import matplotlib
 # Python implementation of dynamic causal model + interoceptive active inference model
 
 
-# this function gets the current most likely value based on input signal interoception 
+# this function gets the current most likely value based on input signal interoception ,
+# EDIT: Make this function return only one vector, updates next timestep in matrix where it is called
 def interoceptive_update(time_data, t, dt, u):
     
     def g(phi):

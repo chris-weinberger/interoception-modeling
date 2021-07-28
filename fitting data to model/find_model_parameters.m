@@ -149,6 +149,17 @@ interpolated_interoceptive_data = zeros(1,60000);
          int_data_mean_norm = interoceptive_data - mean(interoceptive_data);
          interpolated_interoceptive_data = resample(int_data_mean_norm, length(convolved_salience_data), length(int_data_mean_norm)) + mean(interoceptive_data);
          
+         % we want all the data to start at 0, since we are comparing
+         % interactions among regions. Subtract first value from all
+         % timeseries data
+         interpolated_exec_data = interpolated_exec_data - interpolated_exec_data(1);
+         interpolated_salience_data = interpolated_salience_data - interpolated_salience_data(1);
+         interpolated_interoceptive_data = interpolated_interoceptive_data - interpolated_interoceptive_data(1);
+         
+         convolved_exec_data = convolved_exec_data - convolved_exec_data(1);
+         convolved_salience_data = convolved_salience_data - convolved_salience_data(1);
+         convolved_interoceptive_data = convolved_interoceptive_data - convolved_interoceptive_data(1);
+         
          plot ([interpolated_exec_data interpolated_salience_data interpolated_interoceptive_data convolved_exec_data convolved_salience_data convolved_interoceptive_data])
          legend({'fMRI exec', 'fMRI salience', 'fMRI int', 'simulated exec', 'simulated salience', 'simulated int'})
          drawnow;

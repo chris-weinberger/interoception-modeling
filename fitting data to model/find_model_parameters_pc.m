@@ -1,8 +1,13 @@
 % find_model_parameters will open data for a given individual under a
 % certain test (stimulus like neutral or criticism) and call weightsearch
 % inside of fminsearch to find the optimal model parameters to fit the data
+% this model will fit 19 parameters total:
+% - 16 connections in weight matrix
+% - prior mean interoceptive signal
+% - prior variance of interoceptive signal
+% - signal noise from body to insula
 
-function ret=find_model_parameters(individual, test)
+function ret=find_model_parameters_pc(individual, test)
 % default is first control patient
 if nargin < 1, individual = 2303; end
 if nargin < 2, test = 'neutral'; end
@@ -92,8 +97,8 @@ interpolated_exec_data = zeros(1,60000);
 interpolated_salience_data = zeros(1,60000);
 interpolated_interoceptive_data = zeros(1,60000);
 
-     function ret=weightsearch(weights)
-         global gwmat gstartstate ginstates;
+     function ret=weightsearch(modelparameters)
+         global gwmat gstartstate ginstates gpriormean gpriorvar gnoise;
          
          % where we start -- for now assume all networks start at 0.5
          gstartstate=[0  0.5  0.5  0.5 ]; % threat absent vigilant int
@@ -105,14 +110,23 @@ interpolated_interoceptive_data = zeros(1,60000);
              ginstates=[0.5 0 0 0 ]; % threat present vigilant int (criticism)
          end
          
+         % grab relevant parameters
+         weights=modelparameters(1:16);
+         p_mean = modelparameters(17);
+         p_variance = modelparameters(18);
+         noise = modelparameters(19);
+         
          % global weight matrix that will be used in dynamic function
          weight_matrix = reshape(weights, 4, 4);
          gwmat=weight_matrix;
+         gpriormean = p_mean;
+         gpriorvar = p_variance;
+         gnoise = noise;
          
          % --------------------------- GET SIMULATED DATA -------------------------
          % run model simulation with current weight matrix to get simulated time data for each
          % brain region
-         tstats=bada_nn_1999_2('useglobals',0);
+         tstats=dynamical_pc_model('useglobals',0);
          
          model_salience_time_data = tstats.invec(:,2);
          model_exec_time_data = tstats.invec(:,3);
@@ -154,8 +168,11 @@ interpolated_interoceptive_data = zeros(1,60000);
          % timeseries data
          interpolated_exec_data = interpolated_exec_data - interpolated_exec_data(1);
          interpolated_salience_data = interpolated_salience_data - interpolated_salience_data(1);
-         interpolated_exec_data = interpolated_exec_data - interpolated_exec_data(1);
+         interpolated_interoceptive_data = interpolated_interoceptive_data - interpolated_interoceptive_data(1);
          
+         convolved_exec_data = convolved_exec_data - convolved_exec_data(1);
+         convolved_salience_data = convolved_salience_data - convolved_salience_data(1);
+         convolved_interoceptive_data = convolved_interoceptive_data - convolved_interoceptive_data(1);
          
          plot ([interpolated_exec_data interpolated_salience_data interpolated_interoceptive_data convolved_exec_data convolved_salience_data convolved_interoceptive_data])
          legend({'fMRI exec', 'fMRI salience', 'fMRI int', 'simulated exec', 'simulated salience', 'simulated int'})
@@ -172,16 +189,28 @@ interpolated_interoceptive_data = zeros(1,60000);
          ret=loss;
      end
 
+% initial weight matrix
 weight = reshape(owmat,1,16);
+prior_mean = 2;
+prior_variance = 1;
+signal_noise = 1;
 
-modelparams=fminsearch(@weightsearch, weight);
+parameters(1:16)=weight;
+parameters(17) = prior_mean;
+parameters(18) = prior_variance;
+parameters(19) = signal_noise;
+
+modelparams=fminsearch(@weightsearch, parameters);
 
 %save model parameters, correlations, and timeseries fMRI and simulated
 %data to a struct
-return_struct.weights = modelparams;
+return_struct.weights = reshape(modelparams(1:16),4,4);
 return_struct.exec_corr = exec_corr;
 return_struct.sal_corr = sal_corr;
 return_struct.int_corr = int_corr;
+return_struct.prior_mean = modelparams(17);
+return_struct.prior_var = modelparams(18);
+return_struct.signal_noise = modelparams(19);
 
 timeseries.fMRI = [interpolated_salience_data, interpolated_exec_data, interpolated_interoceptive_data];
 timeseries.simulation = [convolved_salience_data, convolved_exec_data, convolved_interoceptive_data];
