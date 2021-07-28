@@ -71,9 +71,9 @@ interoceptiverestcontrols = rmmissing(readtable(filename_interoceptive, opts));
 
 % examine this data later... some values are negative even though there are
 % no negative values in the simulated data. May need to address this
-exec_data = (executiverestcontrols.('brain')-10000)./1000 + 1;
-salience_data = (saliencerestcontrols.('brain')-10000)./1000 + 1;
-interoceptive_data = (interoceptiverestcontrols.('brain')-10000)./1000 + 1;
+exec_data = (executiverestcontrols.('brain')-10000)./50;
+salience_data = (saliencerestcontrols.('brain')-10000)./50;
+interoceptive_data = (interoceptiverestcontrols.('brain')-10000)./50;
 
 plot([exec_data salience_data interoceptive_data])
 

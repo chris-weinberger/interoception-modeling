@@ -16,12 +16,12 @@
 function struct_data=ind_model_parameters_pc
 %curr_ind is individual curr_state is neutral/criticis 
 % WINDOWS
-opts = detectImportOptions('C:\Users\chris\Documents\interoception-modeling\data\executive.dandrois','FileType','text');
-A = readmatrix('C:\Users\chris\Documents\interoception-modeling\data\executive.dandrois',opts);
+% opts = detectImportOptions('C:\Users\chris\Documents\interoception-modeling\data\executive.dandrois','FileType','text');
+% A = readmatrix('C:\Users\chris\Documents\interoception-modeling\data\executive.dandrois',opts);
 
 %UNIX
-% opts = detectImportOptions('/data/executive.dandrois','FileType','text');
-% A = readmatrix('/data/executive.dandrois',opts);
+opts = detectImportOptions('/data/executive.dandrois','FileType','text');
+A = readmatrix('/data/executive.dandrois',opts);
 
 % patient ID's stored in the first column, get all unique values
 individuals = unique(A(:,1));
@@ -31,17 +31,21 @@ individuals = individuals(2:length(individuals),:);
 
 individuals = [2309 3548 3570]; % choosing three profiles do to for testing
 
-for person=1:length(individuals)
+struct_data = struct('val', cell(1,length(individuals)));
+
+parfor person=1:length(individuals)
     % first get the current indivual
     ind = individuals(person);
     disp(ind);
     
+    struct_data(person).neutral.(sprintf("individual_%s",string(ind))) = find_model_parameters_pc(ind, 'neutral');
+    
     % first gather neutral matrix data for current individual
-    struct_data.neutral.(sprintf("individual_%s",string(ind))) = find_model_parameters_pc(ind, 'neutral');
+%     struct_data.neutral.(sprintf("individual_%s",string(ind))) = find_model_parameters_pc(ind, 'neutral');
     
     if ind ~= 2301 % person 2301 doesn't have criticism data
         % next gather criticism matrix data for current individual
-        struct_data.criticism.(sprintf("individual_%s",string(ind))) = find_model_parameters_pc(ind, 'criticism');
+%         struct_data.criticism.(sprintf("individual_%s",string(ind))) = find_model_parameters_pc(ind, 'criticism');
     end
 end
 
