@@ -235,7 +235,8 @@ def external_percept_simulation(typerun='standard'):
     axs[0,0].set_title(instatenames[0])
     
     for brain_network in range(4):
-        axs[0, 1].plot(np.arange(steps) * dt, circuit_situational_data[1,brain_network,:])
+        axs[0, 1].plot(np.arange(steps) * dt, circuit_situational_data[1,brain_network,:])Dwpqwz67
+        
     axs[0,1].set_title(instatenames[1])
     
     for brain_network in range(4):
@@ -278,7 +279,7 @@ def external_percept_simulation(typerun='standard'):
     plt.axis([0, dur, -2, 3])
     plt.title('Interoceptive Approximation and Prediction Errors')
 
-    return circuit_situational_data
+    # return circuit_situational_data
     plt.show()
     
 external_percept_simulation()

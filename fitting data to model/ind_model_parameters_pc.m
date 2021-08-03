@@ -33,7 +33,7 @@ individuals = [2309 3548 3570]; % choosing three profiles do to for testing
 
 struct_data = struct('val', cell(1,length(individuals)));
 
-parfor person=1:length(individuals)
+for person=1:length(individuals)
     % first get the current indivual
     ind = individuals(person);
     disp(ind);
