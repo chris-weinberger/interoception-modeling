@@ -39,7 +39,11 @@ test_subjects = cat(1,patients,controls);
 
 struct_data = struct;
 
+<<<<<<< HEAD
 parfor person=1:length(test_subjects)
+=======
+for person=1:length(individuals)
+>>>>>>> 139ac802b780e30dae9030f264c2317653a5fbb2
     % first get the current indivual
     ind = test_subjects(person);
     disp(ind);
