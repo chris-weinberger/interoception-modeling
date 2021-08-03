@@ -31,11 +31,17 @@ individuals = individuals(2:length(individuals),:);
 
 % individuals = [2309 3548 3570]; % choosing three profiles do to for testing
 
+idx=find(individuals > 3000);
+patients = individuals(idx(1):idx(10));
+controls = individuals(1:10);
+
+test_subjects = cat(1,patients,controls);
+
 struct_data = struct;
 
-parfor person=1:length(individuals)
+parfor person=1:length(test_subjects)
     % first get the current indivual
-    ind = individuals(person);
+    ind = test_subjects(person);
     disp(ind);
     struct_data(person).neutral.(sprintf("individual_%s",string(ind))) = find_model_parameters_pc(ind, 'neutral');
     
