@@ -35,6 +35,9 @@ idx=find(individuals > 3000);
 patients = individuals(idx(1):idx(10));
 controls = individuals(1:10);
 
+patients(6) = 3327;
+controls(1) = 2317;
+
 test_subjects = cat(1,patients,controls);
 
 struct_data = struct;

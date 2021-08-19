@@ -62,8 +62,8 @@ sintAUC = zeros(8,num_trials);
 for simnum=1:num_trials
   %randvals=(rand(3,3)-.5)./2;
   randvals=(rand(4,4)-.5);
-  % was initially [0,1], now [-1,1]
-  gwmat=max(-1,min(1,owmat+randvals)); %why no negative values? No inhibition?
+  % why no negative values? No inhibition? was initially [0,1], now [-1,1]
+  gwmat=max(-1,min(1,owmat+randvals)); 
   tstats(simnum)=bada_nn_1999_2('useglobals',0);
   
   %sgvig 0: columns are trials from above simulation, 
