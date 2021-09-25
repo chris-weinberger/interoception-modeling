@@ -10,7 +10,7 @@ end
 %aumat=xcorr(vec,vec,lag,'coeff');
 %ar=aumat(end);
 
-if length(lag>1)
+if length(lag)>1
   for ct=1:length(lag)
     ar(ct)=r(vec(1:end-ct),vec(1+ct:end));
   end
