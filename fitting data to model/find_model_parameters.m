@@ -77,7 +77,8 @@ owmat=[  .9        .15        0       0   ;   % external threat
    	     0         .9      .25      .25   ;   % vigilance/salience       % FROM THESE NETWORKS
 	  -.25       -.04       .9    -.1   ;   % avoidance/control
          0        .25       .15     .9  ];   % interoception 
-     
+
+% owmat=rand(4,4)
 % initialize correlations and timeseries data in outer function, since they
 % will be returned in a struct later
 exec_corr=0;
@@ -92,6 +93,32 @@ interpolated_exec_data = zeros(1,60000);
 interpolated_salience_data = zeros(1,60000);
 interpolated_interoceptive_data = zeros(1,60000);
 
+% ------------------------- RECORDED BRAIN DATA ---------------------------
+% interpolate all brain data from glabal vars to be the same scale as simulated data
+% note that resample() will produce edge effects because it assumes there
+% are 0's at the start and end of the data. To account for this, we:
+% 1. subtract mean from original data (data set now has mean of 0)
+% 2. resample the mean normalized data
+% 3. add the mean to the resampled data
+exec_data_mean_norm = exec_data - mean(exec_data);
+interpolated_exec_data = resample(exec_data_mean_norm, length(convolved_exec_data), length(exec_data_mean_norm)) + mean(exec_data);
+sal_data_mean_norm = salience_data - mean(salience_data);
+interpolated_salience_data = resample(sal_data_mean_norm, length(convolved_salience_data), length(sal_data_mean_norm)) + mean(salience_data);
+int_data_mean_norm = interoceptive_data - mean(interoceptive_data);
+interpolated_interoceptive_data = resample(int_data_mean_norm, length(convolved_salience_data), length(int_data_mean_norm)) + mean(interoceptive_data);
+
+% we want all the data to start at 0, since we are comparing
+% interactions among regions. Subtract first value from all
+% timeseries data
+
+% QUESTION: is this valid? Won't there be a jump from time 0 (where all
+% regions start at 0) to time 1 (where all regions are whatever
+% they really are)
+
+interpolated_exec_data = interpolated_exec_data - interpolated_exec_data(1);
+interpolated_salience_data = interpolated_salience_data - interpolated_salience_data(1);
+interpolated_interoceptive_data = interpolated_interoceptive_data - interpolated_interoceptive_data(1);
+
      function ret=weightsearch(weights)
          global gwmat gstartstate ginstates;
          
@@ -102,7 +129,7 @@ interpolated_interoceptive_data = zeros(1,60000);
          if strcmp(typetest, 'neutral')
              ginstates=[0 0 0 0 ]; % threat absent vigilant int (neutral)
          else
-             ginstates=[0.5 0 0 0 ]; % threat present vigilant int (criticism)
+             ginstates=[0.1 0 0 0 ]; % threat present vigilant int (criticism)
          end
          
          % global weight matrix that will be used in dynamic function
@@ -112,7 +139,7 @@ interpolated_interoceptive_data = zeros(1,60000);
          % --------------------------- GET SIMULATED DATA -------------------------
          % run model simulation with current weight matrix to get simulated time data for each
          % brain region
-         tstats=bada_nn_1999_2('useglobals',0);
+         tstats=bada_nn_tune_parameters('useglobals',0);
          
          model_salience_time_data = tstats.invec(:,2);
          model_exec_time_data = tstats.invec(:,3);
@@ -135,27 +162,10 @@ interpolated_interoceptive_data = zeros(1,60000);
          convolved_exec_data = conv(model_exec_time_data, hemoir, 'same');
          convolved_interoceptive_data = conv(model_interoceptive_time_data, hemoir, 'same');
          
-         % ------------------------- RECORDED BRAIN DATA ---------------------------
-         % interpolate all brain data from glabal vars to be the same scale as simulated data
-         % note that resample() will produce edge effects because it assumes there
-         % are 0's at the start and end of the data. To account for this, we:
-         % 1. subtract mean from original data (data set now has mean of 0)
-         % 2. resample the mean normalized data
-         % 3. add the mean to the resampled data
-         exec_data_mean_norm = exec_data - mean(exec_data);
-         interpolated_exec_data = resample(exec_data_mean_norm, length(convolved_exec_data), length(exec_data_mean_norm)) + mean(exec_data);
-         sal_data_mean_norm = salience_data - mean(salience_data);
-         interpolated_salience_data = resample(sal_data_mean_norm, length(convolved_salience_data), length(sal_data_mean_norm)) + mean(salience_data);
-         int_data_mean_norm = interoceptive_data - mean(interoceptive_data);
-         interpolated_interoceptive_data = resample(int_data_mean_norm, length(convolved_salience_data), length(int_data_mean_norm)) + mean(interoceptive_data);
          
          % we want all the data to start at 0, since we are comparing
-         % interactions among regions. Subtract first value from all
-         % timeseries data
-         interpolated_exec_data = interpolated_exec_data - interpolated_exec_data(1);
-         interpolated_salience_data = interpolated_salience_data - interpolated_salience_data(1);
-         interpolated_interoceptive_data = interpolated_interoceptive_data - interpolated_interoceptive_data(1);
-         
+        % interactions among regions. Subtract first value from all
+        % timeseries data (same as we did for interpolated brain data)
          convolved_exec_data = convolved_exec_data - convolved_exec_data(1);
          convolved_salience_data = convolved_salience_data - convolved_salience_data(1);
          convolved_interoceptive_data = convolved_interoceptive_data - convolved_interoceptive_data(1);
