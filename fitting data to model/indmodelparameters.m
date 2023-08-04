@@ -35,7 +35,7 @@ inidividuals = [2309]
 
 % retStructArray = repmat(struct('data',{struct('neutral',struct('inidividual_3570',{})), struct('criticism',struct('inidividual_3570',{}))}), length(individuals), 1)
 
-for person=1:length(individuals)
+parfor person=1:length(individuals)
     % first get the current indivual
     ind = individuals(person);
     disp(ind);
