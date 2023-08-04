@@ -123,7 +123,7 @@ interpolated_salience_data = interpolated_salience_data - interpolated_salience_
 interpolated_interoceptive_data = interpolated_interoceptive_data - interpolated_interoceptive_data(1);
 
      function ret=weightsearch(weights)
-         global gwmat gstartstate ginstates gmomentum;
+         global gwmat gstartstate ginstates;
          
          % where we start -- for now assume all networks start at 0.5
          gstartstate=[0  0.5  0.5  0.5 ]; % threat absent vigilant int
@@ -138,14 +138,12 @@ interpolated_interoceptive_data = interpolated_interoceptive_data - interpolated
          
          % split parameters from array passed in
          weight_vals = weights(1:16);
-         momentum = weights(17);
+         
+         % gmomentum = weights(17);
          
          % global weight matrix that will be used in dynamic function
          weight_matrix = reshape(weight_vals, 4, 4);
          gwmat=weight_matrix;
-         
-         % set global momentum variable
-         gmomentum = momentum
          
          % --------------------------- GET SIMULATED DATA -------------------------
          % run model simulation with current weight matrix to get simulated time data for each
@@ -199,7 +197,7 @@ interpolated_interoceptive_data = interpolated_interoceptive_data - interpolated
 weight = reshape(owmat,1,16);
 
 % first 16 indeces are weights, index 17 is momentum
-weight(17) = init_momentum;
+% weight(17) = init_momentum;
 
 % modelparams=fminsearch(@weightsearch, weight);
 
@@ -211,12 +209,12 @@ fun = @(weight) weightsearch(weight);
 % lower and upper bounds for the variables
 % each value in weight matrix between -1 and 1.5, momentum between 0.0005
 % and 0.05
-lb = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0.0005];
-ub = [1.5, 1.5, 1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,0.05];
+lb = [-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6];
+ub = [1.6, 1.6, 1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6];
 
 % run particle swarm optimization
 options = optimoptions('particleswarm', 'MaxIterations',10000);
-[x,fval] = particleswarm(fun, 17, lb, ub, options);
+[x,fval] = particleswarm(fun, 16, lb, ub, options);
 
 
 disp(' optimization results ')
@@ -224,7 +222,7 @@ disp(' optimization results ')
 %save model parameters, correlations, and timeseries fMRI and simulated
 %data to a struct
 return_struct.weights = x(1:16);
-return_struct.momentum = x(17);
+% return_struct.momentum = x(17);
 return_struct.exec_corr = exec_corr;
 return_struct.sal_corr = sal_corr;
 return_struct.int_corr = int_corr;

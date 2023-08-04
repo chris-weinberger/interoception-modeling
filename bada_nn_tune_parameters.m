@@ -14,7 +14,7 @@ end
 
 %comment
 
-global gwmat gstartstate ginstates typetest gmomentum;
+global gwmat gstartstate ginstates typetest;
 
 tstats.psychstates=psychstates;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -28,7 +28,7 @@ tstats.nodenames=nodenames;
 %	          -1       -.5        1        0   ;   % avoidance/control
 %              0        .5        0.3      1  ];   % interoception
 
-momentum=.003;
+momentum=.0004;
 timelimit=60000;
 stimtime=60000;
 % noisemag=0;
@@ -140,7 +140,7 @@ for statenum=1:length(psychstates)
     wmat(2,3)=.4;
    case 'wellregulated'
    case 'useglobals'
-    wmat=gwmat; startstate=gstartstate; instates=ginstates; type = typetest; momentum = gmomentum;
+    wmat=gwmat; startstate=gstartstate; instates=ginstates; type = typetest;
   end
 end
 

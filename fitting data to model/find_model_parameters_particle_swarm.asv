@@ -73,10 +73,10 @@ interoceptive_data = (interoceptiverestcontrols.('brain')-10000)./1000 + 1;
 plot([exec_data salience_data interoceptive_data])
 
 % start Powell's method with the "well regulated" model
-owmat=[  .9        .15        0       0   ;   % external threat
+owmat=gpuArray([  .9        .15        0       0   ;   % external threat
    	     0         .9      .25      .25   ;   % vigilance/salience       % FROM THESE NETWORKS
 	  -.25       -.04       .9    -.1   ;   % avoidance/control
-         0        .25       .15     .9  ];   % interoception 
+         0        .25       .15     .9  ]);   % interoception 
 
 % owmat=rand(4,4)
 
@@ -126,13 +126,13 @@ interpolated_interoceptive_data = interpolated_interoceptive_data - interpolated
          global gwmat gstartstate ginstates gmomentum;
          
          % where we start -- for now assume all networks start at 0.5
-         gstartstate=[0  0.5  0.5  0.5 ]; % threat absent vigilant int
+         gstartstate=gpuArray([0  0.5  0.5  0.5 ]); % threat absent vigilant int
          
          % what comes in
          if strcmp(typetest, 'neutral')
-             ginstates=[0 0 0 0 ]; % threat absent vigilant int (neutral)
+             ginstates=gpuArray([0 0 0 0 ]); % threat absent vigilant int (neutral)
          else
-             ginstates=[0.1 0 0 0 ]; % threat present vigilant int (criticism)
+             ginstates=gpuArray([0.1 0 0 0 ]); % threat present vigilant int (criticism)
          end
          
          
@@ -211,8 +211,8 @@ fun = @(weight) weightsearch(weight);
 % lower and upper bounds for the variables
 % each value in weight matrix between -1 and 1.5, momentum between 0.0005
 % and 0.05
-lb = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0.0005];
-ub = [1.5, 1.5, 1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,0.05];
+lb = [-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,-1.6,0.0003];
+ub = [1.6, 1.6, 1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,0.05];
 
 % run particle swarm optimization
 options = optimoptions('particleswarm', 'MaxIterations',10000);
@@ -220,7 +220,6 @@ options = optimoptions('particleswarm', 'MaxIterations',10000);
 
 
 disp(' optimization results ')
-disp(['mim value of objective func: ', num2str(fval))
 
 %save model parameters, correlations, and timeseries fMRI and simulated
 %data to a struct
