@@ -31,7 +31,9 @@ individuals = individuals(2:length(individuals),:);
 
 individuals = [2309 3548 3570]; % choosing three profiles do to for testing
 
-inidividuals = [2309]
+individuals = [2331 2353 2553 2592 3343 3380 3515 3569];
+
+% inidividuals = [2309]
 
 % retStructArray = repmat(struct('data',{struct('neutral',struct('inidividual_3570',{})), struct('criticism',struct('inidividual_3570',{}))}), length(individuals), 1)
 
