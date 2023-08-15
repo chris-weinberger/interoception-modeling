@@ -29,9 +29,9 @@ individuals = unique(A(:,1));
 % remove 1500 person which is first item
 individuals = individuals(2:length(individuals),:);
 
-individuals = [2309 3548 3570]; % choosing three profiles do to for testing
+% individuals = [2309 3548 3570]; % choosing three profiles do to for testing
 
-individuals = [2331 2353 2553 2592 3343 3380 3515 3569];
+% individuals = [2331 2353 2553 2592 3343 3380 3515 3569];
 
 % inidividuals = [2309]
 
