@@ -31,7 +31,8 @@ tstats.nodenames=nodenames;
 momentum=.001;
 timelimit=60000;
 stimtime=60000;
-noisemag=0;
+% noisemag=0;
+noisemag=0.000015;
 %decvec=[0 -.0002 -.0002 0]; % natural decay in absence of stimuli
 decvec=[0 0 0 0];
 %noisemag=0.0001; % tiny noise completely changes the network - adds threat
@@ -64,6 +65,14 @@ instates=[.1 0 0 0 ; % threat present vigilant int
 % used to denote what type of stimulus user is presented...
 % criticism indicates that they will recieve threat at beginning and
 % halfway through recording
+
+
+% PROBLEM: Originally, if type='criticism' there would be an addition of
+% criticism vector just at time=1 and time = 30000. However, in the fMRI
+% study, criticism was presented for 18 scans, then 18 of rest, then 18
+% criticism, then 18scans rest. So criticism vector should be added for
+% time = [1,15000] and time= [30000,45000]. 
+
 type = 'standard';
 
 % where we start
@@ -100,6 +109,9 @@ wmat=[  .9        .15        0       0   ;   % external threat
 	  -.25       -.04       .9    -.1   ;   % avoidance/control
          0        .25       .15     .9  ];   % interoception
 
+% startstate = 0.1 * startstate;
+% wmat = 0.1 * wmat;
+     
 % wmat = [3.70145616563835,0.136906283054430,0.0115174868162189,-0.0294855359910754;
 % -0.00988584731411681,-1.71513363284323,5.19167529558525,6.51258811638633;
 % -0.0539579351498396,0.430802569672914,-9.33536831616034,1.29183903769569;
@@ -182,9 +194,10 @@ tstats.invec=invec;
 % neural systems in which there is a low basal firing rate which can decrease somewhat but once a 
 % neuron stops firing there is nowhere lower for it to go
 
+
 function[logval]=slimit(x,thresh,negthresh) 
 if nargin<2, thresh=2; end
-if nargin<3, negthresh=0; end % was -.75
+if nargin<3, negthresh=-0.75; end % was -.75
 logval=min(max(x,negthresh),thresh);
 
 
@@ -198,4 +211,5 @@ xlabel('time');
 ylabel('activation');
 hold on
 plot([0 timelimit],[1 1],'k:');
-axis([0 timelimit -.2 2.2]);
+% axis([0 timelimit -.2 2.2]);
+axis([0 timelimit -1.3 2.2]);

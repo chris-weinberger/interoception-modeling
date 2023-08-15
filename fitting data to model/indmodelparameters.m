@@ -29,21 +29,30 @@ individuals = unique(A(:,1));
 % remove 1500 person which is first item
 individuals = individuals(2:length(individuals),:);
 
-individuals = [2309 3548 3570]; % choosing three profiles do to for testing
+% individuals = [2309 3548 3570]; % choosing three profiles do to for testing
 
-for person=1:length(individuals)
+% individuals = [2331 2353 2553 2592 3343 3380 3515 3569];
+
+% inidividuals = [2309]
+
+% retStructArray = repmat(struct('data',{struct('neutral',struct('inidividual_3570',{})), struct('criticism',struct('inidividual_3570',{}))}), length(individuals), 1)
+
+parfor person=1:length(individuals)
     % first get the current indivual
     ind = individuals(person);
     disp(ind);
     
-    % first gather neutral matrix data for current individual
-    struct_data.neutral.(sprintf("individual_%s",string(ind))) = find_model_parameters(ind, 'neutral');
+    retStructArray(person).data.neutral.(sprintf("individual_%s",string(ind))) = find_model_parameters_particle_swarm(ind, 'neutral');
+    
+    % gather neutral matrix data for current individual
+%     struct_data.neutral.(sprintf("individual_%s",string(ind))) = find_model_parameters_particle_swarm(ind, 'neutral');
     
     if ind ~= 2301 % person 2301 doesn't have criticism data
         % next gather criticism matrix data for current individual
-        struct_data.criticism.(sprintf("individual_%s",string(ind))) = find_model_parameters(ind, 'criticism');
+%         struct_data.criticism.(sprintf("individual_%s",string(ind))) = find_model_parameters_particle_swarm(ind, 'criticism');
+        retStructArray(person).data.criticism.(sprintf("individual_%s",string(ind))) = find_model_parameters_particle_swarm(ind, 'criticism');
     end
 end
 
-save individual_weight_matrix.mat struct_data
+save individual_weight_matrix.mat retStructArray
 end
